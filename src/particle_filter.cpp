@@ -19,6 +19,8 @@
 
 using namespace std;
 
+static double EPS = 1E-8;
+
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// TODO: Set the number of particles. Initialize all particles to first position (based on estimates of 
 	//   x, y, theta and their uncertainties from GPS) and all weights to 1. 
@@ -26,11 +28,11 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 	// NOTE: Consult particle_filter.h for more information about this method (and others in this file).
 
     // number of particles generated requires tuning
-    num_particles = 50;
+    num_particles = 100;
 
-    default_random_engine gen;
+    //default_random_engine gen;
 
-    weights.resize(num_particles);
+    //weights.resize(num_particles);
     particles.resize(num_particles);
 
     normal_distribution<double> dist_x(x, std[0]);
@@ -73,7 +75,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
 
     for(auto& particle : particles){
 
-        if (abs(yaw_rate) != 0){
+        if (abs(yaw_rate) > EPS){
             particle.x += (velocity/yaw_rate) * (sin(particle.theta + (yaw_rate * delta_t)) - sin(particle.theta));
             particle.y += (velocity/yaw_rate) * (cos(particle.theta) - cos(particle.theta + (yaw_rate * delta_t)));
             particle.theta += yaw_rate * delta_t;
@@ -223,6 +225,7 @@ void ParticleFilter::resample() {
         const Particle new_particle = particles[index];
         resampled_particles.push_back(new_particle);
     }
+
 
     particles.clear();
     weights.clear();
